@@ -1,8 +1,9 @@
 name: Build BioLog source
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -10,10 +11,13 @@ permissions:
 
 jobs:
   build-source:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout current main
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Reconstruct source
         shell: bash
