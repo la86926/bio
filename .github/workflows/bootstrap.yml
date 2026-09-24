@@ -1,9 +1,8 @@
 name: Build BioLog source
 
 on:
-  workflow_run:
-    workflows: ["pages build and deployment"]
-    types: [completed]
+  issues:
+    types: [opened]
   workflow_dispatch:
 
 permissions:
@@ -11,7 +10,7 @@ permissions:
 
 jobs:
   build-source:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_branch == 'main'
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'BioLog bootstrap trigger'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout current main
@@ -42,7 +41,6 @@ jobs:
               target.parent.mkdir(parents=True, exist_ok=True)
               target.write_bytes(base64.b64decode(content))
 
-          Path("src/vite-env.d.ts").write_text('/// <reference types="vite/client" />\\n', encoding="utf-8")
           print(f"Reconstructed {len(manifest.get('text', {}))} text files and {len(manifest.get('binary', {}))} binary files.")
           PY
 
