@@ -60,4 +60,5 @@ jobs:
             exit 0
           fi
           git commit -m "build: publish BioLog assets"
+          git pull --rebase origin main
           git push
