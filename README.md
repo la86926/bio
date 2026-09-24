@@ -54,16 +54,17 @@ La compilación queda en `dist/`.
 
 ## Publicación en GitHub Pages
 
-El proyecto usa `base: '/bio/'` en `vite.config.ts` y `HashRouter`, por lo que las rutas internas funcionan sin reglas especiales de reescritura.
+El repositorio usa GitHub Pages desde la rama `main`. Para mantener el código fuente y publicar una aplicación Vite compilada, `.github/workflows/deploy.yml`:
 
-El workflow `.github/workflows/deploy.yml` ejecuta:
+1. ejecuta `npm ci`;
+2. ejecuta las pruebas;
+3. compila BioLog con Vite;
+4. publica automáticamente el bundle generado en `assets/`;
+5. copia `biolog-config.json` y `BioLog_Ejemplo.xlsx` a la raíz pública.
 
-1. `npm ci`
-2. `npm test`
-3. `npm run build`
-4. despliegue del directorio `dist/` con GitHub Pages
+El `index.html` detecta GitHub Pages y carga el bundle compilado. En desarrollo local carga `src/main.tsx` mediante Vite. No es necesario cambiar manualmente el origen de Pages.
 
-Si GitHub Pages aún no está activado en el repositorio, entra en **Settings → Pages → Build and deployment → Source** y selecciona **GitHub Actions**. La URL prevista es:
+URL pública:
 
 `https://la86926.github.io/bio/`
 
