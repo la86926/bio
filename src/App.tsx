@@ -12,7 +12,7 @@ import { useBioLog } from './context/BioLogContext'
 
 export default function App() {
   const { loading } = useBioLog()
-  if (loading) return <div className="loading-screen"><img className="brand-logo brand-logo-loading" src={`${import.meta.env.BASE_URL}resultados-de-la-prueba.png`} alt="BioLog" /><p>Cargando BioLog…</p></div>
+  if (loading) return <div className="loading-screen"><img className="brand-logo brand-logo-loading" src={`${import.meta.env.BASE_URL}../resultados-de-la-prueba.png`} alt="BioLog" /><p>Cargando BioLog…</p></div>
   return (
     <Routes>
       <Route element={<Layout />}>
