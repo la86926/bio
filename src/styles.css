@@ -31,7 +31,7 @@ a { color: inherit; text-decoration: none; }
 .logo-wrap { display: flex; align-items: center; gap: 10px; }
 .logo-wrap strong { display: block; font-size: 17px; letter-spacing: -.02em; }
 .logo-wrap span { display: block; color: var(--muted); font-size: 11px; margin-top: 1px; }
-.brand-mark { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--accent); color: white; font-weight: 800; box-shadow: 0 8px 20px rgba(96,125,114,.22); }
+.brand-mark { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--accent); color: white; font-weight: 800; box-shadow: 0 8px 20px rgba(96,125,114,.22); }\n.brand-logo { width: 42px; height: 42px; display: block; object-fit: contain; border-radius: 12px; flex: 0 0 auto; }\n.brand-logo-loading { width: 64px; height: 64px; border-radius: 18px; }
 .sidebar nav { display: grid; gap: 4px; }
 .nav-link { min-height: 42px; padding: 10px 12px; border-radius: 11px; display: flex; align-items: center; gap: 10px; color: #66706d; font-size: 14px; font-weight: 600; transition: .18s ease; }
 .nav-link:hover { background: #f0f3f2; color: #34413c; }
