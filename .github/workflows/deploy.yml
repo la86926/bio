@@ -1,17 +1,24 @@
-name: Deploy BioLog to GitHub Pages
+name: Build BioLog for GitHub Pages
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'tsconfig*.json'
+      - 'index.html'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: biolog-pages-actions
+  group: biolog-pages-build
   cancel-in-progress: true
 
 jobs:
@@ -28,29 +35,29 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --no-audit --no-fund
 
       - name: Run tests
         run: npm test
 
-      - name: Build
+      - name: Build production bundle
         run: npm run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Publish generated assets to main
+        shell: bash
+        run: |
+          rm -rf assets
+          cp -R dist/assets ./assets
+          cp dist/biolog-config.json ./biolog-config.json
+          cp dist/BioLog_Ejemplo.xlsx ./BioLog_Ejemplo.xlsx
+          touch .nojekyll
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets biolog-config.json BioLog_Ejemplo.xlsx .nojekyll
+          if git diff --cached --quiet; then
+            echo "Generated site is already current."
+            exit 0
+          fi
+          git commit -m "build: publish BioLog assets"
+          git push
