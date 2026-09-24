@@ -1,0 +1,114 @@
+name: Restore BioLog bootstrap
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".bootstrap/**"
+      - ".github/workflows/bootstrap-restore.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decode bootstrap
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64, gzip, io, json, shutil, tarfile, zipfile
+
+          root = Path(".")
+          parts = sorted((root / ".bootstrap").glob("chunk*"))
+          if not parts:
+              raise SystemExit("No bootstrap chunks found")
+
+          encoded = "".join(p.read_text(encoding="utf-8").strip() for p in parts)
+          raw = base64.b64decode(encoded)
+
+          def safe_path(name: str) -> Path:
+              p = Path(name)
+              if p.is_absolute() or ".." in p.parts:
+                  raise ValueError(f"Unsafe path: {name}")
+              return root / p
+
+          restored = False
+
+          try:
+              with tarfile.open(fileobj=io.BytesIO(raw), mode="r:gz") as tf:
+                  for member in tf.getmembers():
+                      if member.name.startswith("/") or ".." in Path(member.name).parts:
+                          raise ValueError(f"Unsafe tar path: {member.name}")
+                  tf.extractall(root)
+                  print(f"Restored TAR archive with {len(tf.getmembers())} entries")
+                  restored = True
+          except tarfile.ReadError:
+              pass
+
+          if not restored:
+              data = gzip.decompress(raw)
+              if data[:4] == b"PK\\x03\\x04":
+                  with zipfile.ZipFile(io.BytesIO(data)) as zf:
+                      for name in zf.namelist():
+                          safe_path(name)
+                      zf.extractall(root)
+                      print(f"Restored ZIP archive with {len(zf.namelist())} entries")
+                      restored = True
+              else:
+                  try:
+                      obj = json.loads(data.decode("utf-8"))
+                  except Exception:
+                      obj = None
+
+                  entries = None
+                  if isinstance(obj, dict) and isinstance(obj.get("files"), list):
+                      entries = obj["files"]
+                  elif isinstance(obj, list):
+                      entries = obj
+                  elif isinstance(obj, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in obj.items()):
+                      entries = [{"path": k, "content": v} for k, v in obj.items()]
+
+                  if entries is not None:
+                      count = 0
+                      for entry in entries:
+                          if not isinstance(entry, dict) or "path" not in entry:
+                              continue
+                          path = safe_path(str(entry["path"]))
+                          path.parent.mkdir(parents=True, exist_ok=True)
+                          content = entry.get("content", "")
+                          encoding = entry.get("encoding", "utf-8")
+                          if encoding == "base64":
+                              path.write_bytes(base64.b64decode(content))
+                          else:
+                              path.write_text(str(content), encoding="utf-8")
+                          count += 1
+                      print(f"Restored JSON payload with {count} files")
+                      restored = count > 0
+
+          if not restored:
+              raise SystemExit("Bootstrap format was not recognized; backup retained.")
+
+          # Remove only the temporary bootstrap after successful restoration.
+          shutil.rmtree(root / ".bootstrap")
+          PY
+
+      - name: Commit restored project
+        shell: bash
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Restore BioLog project files"
+          git push
