@@ -1,4 +1,4 @@
-import { BarChart3, Boxes, CalendarRange, ClipboardList, FlaskConical, Gauge, Menu, Settings, Sheet, UsersRound, X, Cloud, CloudOff, RefreshCw } from 'lucide-react'
+import { BarChart3, Boxes, CalendarRange, ClipboardList, Gauge, Menu, Settings, Sheet, UsersRound, X, Cloud, CloudOff, RefreshCw } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useState } from 'react'
 import { useBioLog } from '../context/BioLogContext'
@@ -24,7 +24,7 @@ export function Layout() {
   return <div className="app-shell">
     <aside className={`sidebar ${open ? 'open' : ''}`}>
       <div className="sidebar-head">
-        <div className="logo-wrap"><div className="brand-mark"><FlaskConical size={19}/></div><div><strong>BioLog</strong><span>Laboratorio</span></div></div>
+        <div className="logo-wrap"><img className="brand-logo" src={`${import.meta.env.BASE_URL}resultados-de-la-prueba.png`} alt="BioLog" /><div><strong>BioLog</strong><span>Laboratorio</span></div></div>
         <button className="icon-button mobile-only" onClick={() => setOpen(false)} aria-label="Cerrar menú"><X size={20}/></button>
       </div>
       <nav>
