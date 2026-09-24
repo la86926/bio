@@ -3,8 +3,6 @@ name: Build BioLog source
 on:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/bootstrap.yml"
   workflow_dispatch:
 
 permissions:
