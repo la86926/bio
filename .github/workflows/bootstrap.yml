@@ -46,7 +46,9 @@ jobs:
           PY
 
           rm -rf .bootstrap
-          rm -f .github/workflows/bootstrap.yml
+          # El token interno de Actions no puede crear workflows.
+          # deploy.yml se publicará después mediante la conexión GitHub autorizada.
+          rm -f .github/workflows/deploy.yml
 
       - name: Setup Node
         uses: actions/setup-node@v4
