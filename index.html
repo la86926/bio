@@ -9,6 +9,17 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      const onGitHubPages = location.hostname.endsWith('github.io') && location.pathname.startsWith('/bio')
+      if (onGitHubPages) {
+        const stylesheet = document.createElement('link')
+        stylesheet.rel = 'stylesheet'
+        stylesheet.href = '/bio/assets/biolog.css'
+        document.head.appendChild(stylesheet)
+        await import('/bio/assets/biolog.js')
+      } else {
+        await import('/bio/src/main.tsx')
+      }
+    </script>
   </body>
 </html>
