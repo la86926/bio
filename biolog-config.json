@@ -1,0 +1,10 @@
+{
+  "microsoft": {
+    "enabled": false,
+    "clientId": "",
+    "tenantId": "common",
+    "siteId": "",
+    "dataListId": "",
+    "usersListId": ""
+  }
+}
